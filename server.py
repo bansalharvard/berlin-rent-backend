@@ -596,17 +596,19 @@ async def seed_data():
     
     return {"message": f"Seeded {len(sample_offerings) + len(sample_looking)} listings", "seeded": True}
 
-# Include the router in the main app
-app.include_router(api_router)
-
 # CORS middleware
 app.add_middleware(
     CORSMiddleware,
-    allow_credentials=True,
+    allow_credentials=False,
     allow_origins=["*"],
     allow_methods=["*"],
     allow_headers=["*"],
 )
+
+# Include the router in the main app
+app.include_router(api_router)
+
+
 
 # Configure logging
 logging.basicConfig(
