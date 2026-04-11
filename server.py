@@ -184,7 +184,7 @@ Keep it under 50 words, friendly and informative."""
         return ""
 
 async def suggest_ai_price(data: AIPriceRequest) -> Optional[float]:
-    if not db:
+    if db is None:
         return None
         
     query = {"neighborhood": data.neighborhood, "rent_type": data.rent_type, "listing_type": "offering"}
@@ -248,7 +248,7 @@ async def get_neighborhoods():
 
 @api_router.post("/listings", response_model=Listing)
 async def create_listing(data: ListingCreate):
-    if not db:
+    if db is None:
         raise HTTPException(status_code=503, detail="Database not connected")
     
     neighborhood = data.neighborhood or find_nearest_neighborhood(data.lat, data.lng)
@@ -321,7 +321,7 @@ async def get_listings(
     furnished: Optional[bool] = None,
     limit: int = Query(default=100, le=500)
 ):
-    if not db:
+    if db is None:
         raise HTTPException(status_code=503, detail="Database not connected")
     
     query = {}
@@ -356,7 +356,7 @@ async def get_listings(
 
 @api_router.get("/listings/{listing_id}", response_model=Listing)
 async def get_listing(listing_id: str):
-    if not db:
+    if db is None:
         raise HTTPException(status_code=503, detail="Database not connected")
     
     listing = await db.listings.find_one({"id": listing_id}, {"_id": 0})
@@ -370,7 +370,7 @@ async def get_listing(listing_id: str):
 
 @api_router.delete("/listings/{listing_id}")
 async def delete_listing(listing_id: str):
-    if not db:
+    if db is None:
         raise HTTPException(status_code=503, detail="Database not connected")
     
     result = await db.listings.delete_one({"id": listing_id})
@@ -380,7 +380,7 @@ async def delete_listing(listing_id: str):
 
 @api_router.post("/listings/{listing_id}/comments")
 async def add_comment(listing_id: str, comment: CommentCreate):
-    if not db:
+    if db is None:
         raise HTTPException(status_code=503, detail="Database not connected")
     
     comment_doc = {
@@ -402,7 +402,7 @@ async def add_comment(listing_id: str, comment: CommentCreate):
 
 @api_router.get("/listings/{listing_id}/comments")
 async def get_comments(listing_id: str):
-    if not db:
+    if db is None:
         raise HTTPException(status_code=503, detail="Database not connected")
     
     listing = await db.listings.find_one({"id": listing_id}, {"_id": 0, "comments": 1})
@@ -412,7 +412,7 @@ async def get_comments(listing_id: str):
 
 @api_router.get("/stats/dashboard")
 async def get_dashboard_stats():
-    if not db:
+    if db is None:
         raise HTTPException(status_code=503, detail="Database not connected")
     
     all_listings = await db.listings.find(
@@ -473,7 +473,7 @@ async def get_dashboard_stats():
 
 @api_router.get("/stats/neighborhoods", response_model=List[NeighborhoodStats])
 async def get_neighborhood_stats():
-    if not db:
+    if db is None:
         raise HTTPException(status_code=503, detail="Database not connected")
     
     pipeline = [
@@ -518,7 +518,7 @@ async def suggest_price(data: AIPriceRequest):
 
 @api_router.post("/seed")
 async def seed_data():
-    if not db:
+    if db is None:
         raise HTTPException(status_code=503, detail="Database not connected")
     
     count = await db.listings.count_documents({})
